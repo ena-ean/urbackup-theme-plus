@@ -1,0 +1,35 @@
+# The repository IS the extension: a clone can be loaded unpacked as-is. Everything
+# below is author-side tooling or local state, kept out of the published tree on
+# purpose, so a reader sees the extension and nothing else.
+
+# ---------- dependencies and release artefacts ----------
+node_modules/
+dist/
+*.zip
+
+# ---------- local work ----------
+# probes, saved copies of the server markup, recorded API answers, screenshots
+scratch/
+html-ref/
+tests/
+tools/
+package.json
+package-lock.json
+
+# ---------- author notes and internal guides ----------
+# README.md is the public document; these are working notes
+AGENTS.md
+PROGRESS.md
+docs/*
+!docs/screenshots/
+!docs/screenshots/*.png
+
+# ---------- editor / OS / dumps ----------
+.vscode/
+.idea/
+*.code-workspace
+*.heapsnapshot
+trace*.json
+*.log
+.DS_Store
+Thumbs.db

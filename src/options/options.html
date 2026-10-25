@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>UrBackup Theme+ settings</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      /* same logo palette as src/content/tokens.css - the options page is
+         chrome-extension:// and does not load the content stylesheet */
+      --bg: #0b0e13;
+      --nav: #0e131a;
+      --surface: #141a22;
+      --surface-2: #1a222c;
+      --border: #232d3a;
+      --text: #e6ebf2;
+      --dim: #b6c0cd;
+      --mute: #8895a7;
+      --primary: #1046ae;
+      --on-primary: #f4f8ff;
+      --accent: #4d7fe0;
+      --accent-2: #7f9ccb;
+      --ink: #0b0e13;
+      --danger: #e5534b;
+      --glow: rgba(16, 70, 174, 0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px 20px 64px;
+      background: radial-gradient(1200px 600px at 15% -10%, var(--glow) 0%, rgba(11, 14, 19, 0) 62%), var(--bg);
+      color: var(--text);
+      font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    p.lead { color: var(--dim); margin: 0 0 24px; }
+    p.note { color: var(--dim); margin: 0; font-size: 13px; }
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    section h2 {
+      margin: 0 0 16px;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .row { display: flex; gap: 12px; align-items: center; }
+    .row + .row { margin-top: 12px; }
+    .row label { flex: 0 0 170px; color: var(--dim); font-size: 13px; }
+    select, input[type="url"] {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 8px 10px;
+      font: inherit;
+      min-width: 0;
+    }
+    select:focus, input[type="url"]:focus { outline: 2px solid rgba(77, 127, 224, .45); }
+    button {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 8px 16px;
+      font: inherit;
+      cursor: pointer;
+    }
+    button.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); font-weight: 600; }
+    button:hover { filter: brightness(1.08); }
+    .check { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; color: var(--dim); }
+    .check input { margin-top: 3px; accent-color: var(--accent); width: 16px; height: 16px; }
+    .check span small { display: block; color: var(--mute); font-size: 12px; }
+    .actions { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+    #status { color: var(--accent); font-size: 13px; min-height: 20px; }
+    #status.error { color: var(--danger); }
+    ul.servers { list-style: none; margin: 12px 0 0; padding: 0; font-size: 13px; color: var(--dim); }
+    ul.servers li { padding: 6px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; gap: 12px; }
+    .server-actions { display: flex; gap: 8px; align-items: center; flex: 0 0 auto; }
+    .state { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; border-radius: 999px; padding: 1px 8px; }
+    .state.off { background: rgba(229, 83, 75, .16); color: #f2b4af; }
+    code { font-family: ui-monospace, Consolas, monospace; background: var(--surface-2); border-radius: 4px; padding: 1px 5px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>UrBackup Theme+</h1>
+  <p class="lead">Appearance and behaviour of the UrBackup web interface.</p>
+
+  <section>
+    <h2>Theme</h2>
+    <p class="note">Dark theme only - it is applied to every UrBackup page automatically.</p>
+  </section>
+
+  <section>
+    <h2>Features</h2>
+    <label class="check"><input type="checkbox" id="chips">
+      <span>Status chips<small>Readable pills and dots instead of solid coloured table cells.</small></span>
+    </label>
+    <label class="check"><input type="checkbox" id="sticky">
+      <span>Sticky elements<small>Keep the settings tab bars pinned under the navigation while scrolling.</small></span>
+    </label>
+    <label class="check"><input type="checkbox" id="hotkeys">
+      <span>Keyboard shortcuts<small>1-6 switch views, / focuses the search field, Ctrl+Alt+U turns the theme off/on.</small></span>
+    </label>
+    <label class="check"><input type="checkbox" id="emptyStates">
+      <span>Empty states<small>Show a friendly message instead of blank panels.</small></span>
+    </label>
+    <label class="check"><input type="checkbox" id="icons">
+      <span>Pixel icons<small>Small pixel-art glyphs for the main navigation sections.</small></span>
+    </label>
+    <label class="check"><input type="checkbox" id="files">
+      <span>File browser<small>File-type icons, tidy sizes and dates in Clients &gt; backup file lists.</small></span>
+    </label>
+    <label class="check"><input type="checkbox" id="loginBrand">
+      <span>Login logo<small>Pixel-art UrBackup mark above the login card.</small></span>
+    </label>
+    <p class="note">Changes apply to open UrBackup tabs right away.</p>
+  </section>
+
+  <section>
+    <h2>Servers</h2>
+    <p class="note">Open your UrBackup server at any address (LAN IP, DNS name, port): the
+      extension icon appears in the toolbar on its pages and shows the state of that
+      server - <strong>on</strong> or <strong>off</strong>. Click it once and allow access to that
+      server; click it again to switch the theme off for that address (the page reloads
+      into the stock UI). A server switched off stays listed below.</p>
+    <div class="row">
+      <label for="server">Add by URL</label>
+      <input type="url" id="server" placeholder="http://192.168.1.10:55414/">
+      <button id="addServer">Add</button>
+    </div>
+    <ul class="servers" id="servers"></ul>
+  </section>
+
+  <div class="actions">
+    <button class="primary" id="save">Save</button>
+    <button id="reset">Reset to defaults</button>
+    <span id="status"></span>
+  </div>
+</main>
+<script src="../shared/registry.js"></script>
+<script src="options.js"></script>
+</body>
+</html>
+

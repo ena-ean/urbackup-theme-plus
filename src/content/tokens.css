@@ -1,0 +1,149 @@
+/*
+ * UrBackup Theme+ design tokens.
+ * One dark palette for the whole theme, taken from the UrBackup logo: a
+ * graphite-navy surface ladder, the logo blue as the main colour, a lighter blue
+ * as the accent, and green/amber/red for status only. Change a colour here, never
+ * in theme.css.
+ *
+ * The logo palette (as agreed with the project):
+ *   #0b0e13 bg        #0e131a nav        #141a22 surface     #1a222c surface-2
+ *   #232d3a border    #e6ebf2 text       #8895a7 muted       #1046ae primary
+ *   #4d7fe0 accent    #7f9ccb accent-2   #3fb950 success     #d9a441 warning
+ *   #e5534b danger    rgba(16,70,174,.10) glow
+ * Everything else below is derived from that set (one step lighter/darker) or is
+ * a semantic alias, so a re-brand touches this block only.
+ *
+ * Every rule in theme.css is scoped with html[data-ubx] so the page can be restored
+ * to its stock look by removing that attribute (or via ?ubx=off).
+ */
+
+html[data-ubx] {
+  --ubx-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ubx-font-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+  --ubx-radius: 12px;
+  --ubx-radius-sm: 8px;
+  --ubx-radius-pill: 999px;
+
+  /* Type scale - five steps, so no section invents its own px value.
+     1 badge/caption · 2 meta and panel headings · 3 table body and mono ·
+     4 body · 5 brand, big numbers, phone headings · 6 section heading.
+     Values follow the usual 11/12/13/14/16/20 ladder (tailwind's xs=12,
+     sm=14, base=16 shifted one step down for a data-dense admin UI). */
+  --ubx-fs-1: 11px;
+  --ubx-fs-2: 12px;
+  --ubx-fs-3: 13px;
+  --ubx-fs-4: 14px;
+  --ubx-fs-5: 16px;
+  --ubx-fs-6: 20px;
+  --ubx-lh-tight: 1.25;
+  --ubx-lh-body: 1.5;
+
+  --ubx-space-1: 4px;
+  --ubx-space-2: 8px;
+  --ubx-space-3: 12px;
+  --ubx-space-4: 16px;
+  --ubx-space-5: 24px;
+  --ubx-space-6: 32px;
+
+  --ubx-navbar-h: 64px;
+  /* What the page has to clear. Normally the same as the design height, but the
+     bar wraps on a narrow window, so features/relayout.js measures the real one
+     and writes it here. It is a SEPARATE token on purpose: anything that feeds
+     back into the bar's own min-height/brand height would make the bar grow on
+     every measurement. */
+  --ubx-navbar-offset: 64px;
+  --ubx-footer-h: 56px;
+
+  /* One shell for the fixed navbar, the content container and the footer.
+     --ubx-shell-pad is the inner inset on every level (15px is Bootstrap's own
+     .container/.container-fluid padding; a .row has -15px margins, so this value
+     must stay >= 15px or every row overflows the page). --ubx-shell-max stops
+     the panels from spreading into 2000px-wide table rows on a big screen. */
+  --ubx-shell-pad: 15px;
+  --ubx-shell-max: 1430px;
+}
+
+/* The shell grows in two steps. Below 1440px the min() keeps the content fluid,
+   so there is no width jump at any breakpoint. */
+@media (min-width: 1440px) {
+  html[data-ubx] {
+    --ubx-shell-max: 1560px;
+  }
+}
+
+@media (min-width: 1920px) {
+  html[data-ubx] {
+    --ubx-shell-max: 1760px;
+    --ubx-shell-pad: 18px;
+  }
+}
+
+/* Dark theme - the only palette. Values are the logo set; the derived steps are
+   marked so a later edit cannot drift off the two-step ladder. */
+html[data-ubx],
+html[data-ubx][data-ubx-theme="dark"] {
+  color-scheme: dark;
+
+  --ubx-bg: #0b0e13;
+  /* the soft blue glow in the top-left of the page area (logo primary at 10%) */
+  --ubx-glow: rgba(16, 70, 174, 0.1);
+  --ubx-bg-grad: radial-gradient(1200px 600px at 15% -10%, var(--ubx-glow) 0%, rgba(11, 14, 19, 0) 62%);
+  --ubx-nav: #0e131a;
+  --ubx-surface: #141a22;
+  --ubx-surface-2: #1a222c;
+  /* derived: one step above surface-2, the hover fill */
+  --ubx-surface-3: #212b37;
+  --ubx-border: #232d3a;
+  /* derived: one step above the border, for hover edges and dividers */
+  --ubx-border-strong: #2e3a4a;
+
+  --ubx-text: #e6ebf2;
+  /* derived: midway between text and muted (9.5:1 on surface) */
+  --ubx-text-dim: #b6c0cd;
+  /* #8895a7 keeps small muted text at 5.75:1 on --ubx-surface, 5.27 on -2 */
+  --ubx-text-mute: #8895a7;
+
+  /* The logo blue: main buttons and the active nav item. Dark enough to carry
+     light ink (6.99:1 with --ubx-text). */
+  --ubx-primary: #1046ae;
+  --ubx-primary-hover: #1656cc;
+  --ubx-primary-press: #0c3a92;
+  --ubx-primary-soft: rgba(16, 70, 174, 0.22);
+  --ubx-on-primary: #f4f8ff;
+
+  /* The accent: links, numbers, dots, focus. 4.52:1 on --ubx-surface. */
+  --ubx-accent: #4d7fe0;
+  --ubx-accent-2: #7f9ccb;
+  --ubx-accent-hover: #6691e8;
+  --ubx-accent-press: #3d6cc9;
+  --ubx-accent-soft: rgba(77, 127, 224, 0.14);
+  --ubx-accent-border: rgba(77, 127, 224, 0.45);
+
+  /* Ink for text sitting on a bright fill (accent/ok/warn/danger are all mid
+     bright, so every one of them takes dark ink: 5.0 / 7.5 / 8.1 / 5.3:1). */
+  --ubx-ink: #0b0e13;
+  --ubx-accent-ink: var(--ubx-ink);
+
+  --ubx-ok: #3fb950;
+  --ubx-warn: #d9a441;
+  --ubx-danger: #e5534b;
+  --ubx-info: #4d7fe0;
+
+  --ubx-ok-soft: rgba(63, 185, 80, 0.14);
+  --ubx-warn-soft: rgba(217, 164, 65, 0.14);
+  --ubx-danger-soft: rgba(229, 83, 75, 0.16);
+  --ubx-info-soft: rgba(77, 127, 224, 0.14);
+
+  --ubx-shadow: 0 12px 32px rgba(3, 6, 11, 0.42);
+  --ubx-shadow-sm: 0 2px 8px rgba(3, 6, 11, 0.32);
+  --ubx-shadow-pop: 0 18px 44px rgba(3, 6, 11, 0.55);
+  --ubx-focus: 0 0 0 3px rgba(77, 127, 224, 0.4);
+  /* 1px light along the top edge - the "pixel bevel" that separates a panel
+     from the page without a second border colour */
+  --ubx-hairline: inset 0 1px 0 rgba(230, 235, 242, 0.045);
+  /* A table stripe has to sit far below --ubx-surface-2, otherwise it competes
+     with the hover state. */
+  --ubx-row-zebra: rgba(255, 255, 255, 0.015);
+}
+

@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "UrBackup Theme+",
+  "short_name": "UBX Theme",
+  "version": "0.2.0",
+  "description": "Dark theme with pixel-art accents and UX improvements for the UrBackup web interface.",
+  "minimum_chrome_version": "111",
+  "icons": {
+    "16": "src/assets/icons/icon-16.png",
+    "32": "src/assets/icons/icon-32.png",
+    "48": "src/assets/icons/icon-48.png",
+    "128": "src/assets/icons/icon-128.png"
+  },
+  "permissions": ["storage", "scripting", "activeTab", "declarativeContent"],
+  "host_permissions": ["http://localhost/*", "http://127.0.0.1/*"],
+  "optional_host_permissions": ["http://*/*", "https://*/*"],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/assets/brand/logo.png"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ],
+  "background": {
+    "service_worker": "src/background/sw.js"
+  },
+  "action": {
+    "default_title": "UrBackup Theme+"
+  },
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://localhost/*", "http://127.0.0.1/*"],
+      "js": ["src/content/bridge.main.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["http://localhost/*", "http://127.0.0.1/*"],
+      "css": ["src/content/tokens.css", "src/content/theme.css"],
+      "js": [
+        "src/content/features/relayout.js",
+        "src/content/features/chips.js",
+        "src/content/features/sticky.js",
+        "src/content/features/hotkeys.js",
+        "src/content/features/empty-states.js",
+        "src/content/features/icons.js",
+        "src/content/features/files.js",
+        "src/content/features/login-brand.js",
+        "src/content/decorate.js",
+        "src/content/ubx.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}

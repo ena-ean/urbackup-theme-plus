@@ -1,0 +1,2444 @@
+/*
+ * theme.css - the visual layer of UrBackup Theme+.
+ *
+ * Every selector is prefixed with html[data-ubx] (ubx.js sets the attribute), so
+ * the page falls back to its stock look the moment the attribute is removed -
+ * that is what the kill switch and the smoke suite rely on.
+ *
+ * Colours, radii and spacing come from var(--ubx-*) tokens in tokens.css. Never
+ * hard-code a colour here; add a token instead, otherwise the palette drifts.
+ *
+ * Where to edit what - sections in file order:
+ *   base                 html/body, scrollbars, typography
+ *   navbar               fixed top bar, brand, nav links
+ *   layout               container widths, page gutters
+ *   footer               the body-level footer bar (ubx.js#markFooter)
+ *   panels               panel, panel-heading, panel-body
+ *   tables               stock tables, row states, row headers
+ *   DataTables           wrapper, filter, pagination, info, buttons
+ *   statistics layout    the chart grid on the Statistics page
+ *   buttons              .btn variants and icon spacing
+ *   forms                inputs, selects, checkboxes, form groups
+ *   navigation           settings tabs (#nav_pos, #settings_tabber)
+ *   dropdowns            .dropdown-menu, bootstrap-select
+ *   alerts / labels      alerts, labels, badges, wells
+ *   modals               modal dialog, header, footer
+ *   progress             progress bars and the activity rows
+ *   misc                 everything that fits nowhere else
+ *   feature: *           one block per features/*.js module (see its Marks line)
+ *   motion               the pixel-style micro animations
+ *   accessibility        focus rings, reduced motion
+ *   login                the login card and the pixel brand mark
+ *   responsive           phone/tablet overrides (keep this block last)
+ */
+
+/* ---------- base ---------- */
+html[data-ubx] {
+  background: var(--ubx-bg);
+  /* a dark UI must not flash the stock translucent blue box on every tap */
+  -webkit-tap-highlight-color: transparent;
+  /* A view switch changes the page height (the old view is gone while the new
+     one loads), so the scrollbar used to appear and disappear - which shifts
+     every panel sideways. Reserving the gutter keeps the layout still. */
+  scrollbar-gutter: stable;
+}
+
+html[data-ubx] body {
+  padding-top: var(--ubx-navbar-offset) !important;
+  min-height: 100%;
+  background: var(--ubx-bg-grad), var(--ubx-bg);
+  background-attachment: fixed;
+  color: var(--ubx-text);
+  font-family: var(--ubx-font);
+  font-size: var(--ubx-fs-4);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* The stack names Inter (the design reference), but the extension does not
+     ship the font: on Windows the text falls back to Segoe UI, which has only
+     Regular + Bold. A requested 500 then gets a *synthesised* face - stems
+     thickened unevenly, which at 13px reads as "pixelated" (checked with
+     scratch/probe-font-weight.mjs: 300==400 and 600==700, 500 sits between and
+     looks smeared). Refuse synthetic weights so a missing face falls back to a
+     real one; the theme only asks for 400 and 600, which exist everywhere. */
+  font-synthesis-weight: none;
+}
+
+html[data-ubx] ::selection {
+  background: var(--ubx-accent-soft);
+  color: var(--ubx-accent);
+}
+
+html[data-ubx] a {
+  color: var(--ubx-accent);
+  transition: color 0.15s ease;
+}
+
+html[data-ubx] a:hover,
+html[data-ubx] a:focus {
+  color: var(--ubx-accent);
+  text-decoration: none;
+  filter: brightness(1.15);
+}
+
+html[data-ubx] hr {
+  border-color: var(--ubx-border);
+}
+
+/* bootstrap-select: let the control take the room it needs instead of
+   clipping the label ("All client s") inside narrow columns */
+html[data-ubx] .panel-body .bootstrap-select.btn-group {
+  width: auto !important;
+  min-width: 140px;
+}
+
+html[data-ubx] .bootstrap-select .filter-option {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* scrollbars: scoped, because a global rule gives the stock layout visible
+   scrollbars on containers that used to render none */
+html[data-ubx] body::-webkit-scrollbar,
+html[data-ubx] .bootstrap-select .dropdown-menu::-webkit-scrollbar,
+html[data-ubx] .dropdown-menu::-webkit-scrollbar,
+html[data-ubx] .modal-body::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html[data-ubx] body::-webkit-scrollbar-track,
+html[data-ubx] .bootstrap-select .dropdown-menu::-webkit-scrollbar-track,
+html[data-ubx] .dropdown-menu::-webkit-scrollbar-track,
+html[data-ubx] .modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html[data-ubx] body::-webkit-scrollbar-thumb,
+html[data-ubx] .bootstrap-select .dropdown-menu::-webkit-scrollbar-thumb,
+html[data-ubx] .dropdown-menu::-webkit-scrollbar-thumb,
+html[data-ubx] .modal-body::-webkit-scrollbar-thumb {
+  background: var(--ubx-border-strong);
+  border: 3px solid transparent;
+  border-radius: var(--ubx-radius-pill);
+  background-clip: content-box;
+}
+
+html[data-ubx] body::-webkit-scrollbar-thumb:hover,
+html[data-ubx] .bootstrap-select .dropdown-menu::-webkit-scrollbar-thumb:hover,
+html[data-ubx] .dropdown-menu::-webkit-scrollbar-thumb:hover,
+html[data-ubx] .modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--ubx-text-mute);
+  background-clip: content-box;
+}
+
+/* ---------- navbar ---------- */
+html[data-ubx] .navbar-fixed-top {
+  border: 0;
+  border-bottom: 1px solid var(--ubx-border);
+  box-shadow: var(--ubx-shadow-sm);
+}
+
+html[data-ubx] .navbar-inverse {
+  background: var(--ubx-nav);
+  min-height: var(--ubx-navbar-h);
+}
+
+html[data-ubx] .navbar-inverse .navbar-brand {
+  height: var(--ubx-navbar-h);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 0 0;
+  color: var(--ubx-text);
+  font-family: var(--ubx-font);
+  font-weight: 600;
+  font-size: var(--ubx-fs-5);
+  letter-spacing: 0.02em;
+  /* same stock emboss as the buttons: `.navbar-brand,.navbar-nav>li>a`
+     {text-shadow:0 1px 0 rgba(255,255,255,.25)}, overridden to a black shadow by
+     the -inverse variant - both add a dirty edge to a 14px label */
+  text-shadow: none;
+}
+
+html[data-ubx] .navbar-inverse .navbar-brand img {
+  position: static !important;
+  float: none !important;
+  top: 0 !important;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+}
+
+html[data-ubx] .navbar-inverse .navbar-nav > li > a {
+  color: var(--ubx-text-dim);
+  font-size: var(--ubx-fs-4);
+  padding: 20px 14px;
+  border-bottom: 2px solid transparent;
+  text-shadow: none;
+  /* no 300 ms double-tap-zoom delay on the tab bar */
+  touch-action: manipulation;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+html[data-ubx] .navbar-inverse .navbar-nav > li > a:hover,
+html[data-ubx] .navbar-inverse .navbar-nav > li > a:focus {
+  color: var(--ubx-text);
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom-color: var(--ubx-border-strong);
+}
+
+html[data-ubx] .navbar-inverse .navbar-nav > li.active > a,
+html[data-ubx] .navbar-inverse .navbar-nav > li.active > a:hover,
+html[data-ubx] .navbar-inverse .navbar-nav > li.active > a:focus {
+  color: var(--ubx-text);
+  /* the active tab takes the logo blue as a tint, the crisp line under it is the
+     lighter accent so it is visible against the navbar */
+  background: var(--ubx-primary-soft);
+  font-weight: 600;
+  border-bottom-color: var(--ubx-accent);
+}
+
+html[data-ubx] .navbar-inverse .navbar-toggle {
+  border-color: var(--ubx-border-strong);
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+html[data-ubx] .navbar-inverse .navbar-toggle .icon-bar {
+  background: var(--ubx-text-dim);
+}
+
+
+/* ---------- layout ---------- */
+/* One shell width for the fixed navbar, the content container and the footer.
+   Without it the navbar (a full-width container-fluid) starts at the window
+   edge while the content is a centred, capped column: at 1920 the nav links and
+   the first panel sat 254px apart, which is what made the page look "off" on a
+   large screen. min() keeps it fluid below the cap, so nothing jumps at a
+   breakpoint either. */
+html[data-ubx] #boostrap_container,
+html[data-ubx] .navbar-fixed-top > .container-fluid,
+html[data-ubx] .ubx-footer > .container-fluid {
+  width: min(var(--ubx-shell-max), calc(100% - var(--ubx-shell-pad) * 2));
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--ubx-shell-pad);
+  padding-right: var(--ubx-shell-pad);
+  box-sizing: border-box;
+}
+
+/* The server inlines overflow:auto on the container, which turns it into a
+   non-scrolling scrollport and kills every position:sticky inside it. The page
+   actually scrolls with the window, so let the overflow through. */
+html[data-ubx] #boostrap_container {
+  overflow: visible !important;
+}
+
+/* The navbar is fixed: the page has to start below it. The offset comes from
+   --ubx-navbar-offset (base body rule above) so the sticky bars below the bar
+   and the page share one number; the server inlines a hard-coded 70px that knows
+   nothing about the real bar height. */
+html[data-ubx] body {
+  height: auto !important;
+}
+
+html[data-ubx] .pos_bar {
+  margin: 18px 0 0;
+  display: flow-root;
+}
+
+html[data-ubx] .pos_bar:empty,
+html[data-ubx] #nav_pos:empty {
+  display: none;
+}
+
+html[data-ubx] #data_div {
+  padding-bottom: var(--ubx-space-6);
+}
+
+/* UrBackup empties #data_f before the new view's ajax answer lands. Without a
+   floor the page collapses to the footer for a moment (the "sections get
+   shorter" jump), so the container keeps a viewport-sized minimum. */
+html[data-ubx] #data_f {
+  min-height: 60vh;
+}
+
+html[data-ubx] #nav_pos {
+  color: var(--ubx-text-dim);
+  font-size: var(--ubx-fs-3);
+}
+
+/* ---------- footer ---------- */
+html[data-ubx]:has(.ubx-footer) body {
+  padding-bottom: var(--ubx-footer-h);
+}
+
+/* The stock footer div carries `position: relative` **inline**
+   (`<div style="position: relative;margin-top: -4em;width: 100%;height: 4em;
+   overflow:hidden;clear:both">`), so a plain `position: fixed` loses against it
+   and the bar stays in the flow: on a short page it then floats somewhere above
+   the window bottom instead of sitting on it. Only !important beats an inline
+   declaration - the other inline properties here need it for the same reason. */
+html[data-ubx] .ubx-footer {
+  position: fixed !important;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1020;
+  height: auto !important;
+  overflow: visible !important;
+  margin-top: 0 !important;
+  background: var(--ubx-surface);
+  border-top: 1px solid var(--ubx-border);
+}
+
+/* The footer container takes its width and padding from the shell rule in the
+   layout section: its own max-width (1400px) made the footer start 180px right
+   of the panels on a 1920 screen. */
+
+html[data-ubx] .ubx-footer .well,
+html[data-ubx] .ubx-footer .well-sm {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  padding: 7px 0;
+  min-height: 40px;
+}
+
+html[data-ubx] .ubx-footer .control-label {
+  padding-top: 7px;
+  font-size: var(--ubx-fs-2);
+  font-weight: 400;
+  color: var(--ubx-text-mute);
+}
+
+html[data-ubx] .ubx-footer select.form-control {
+  height: 30px;
+  max-width: 220px;
+  font-size: var(--ubx-fs-2);
+}
+
+html[data-ubx] .navbar-fixed-bottom,
+html[data-ubx] .well.well-sm {
+  background: var(--ubx-surface);
+}
+
+html[data-ubx] .well,
+html[data-ubx] .well-sm {
+  background: var(--ubx-surface-2);
+  border: 1px solid var(--ubx-border);
+  border-radius: var(--ubx-radius-sm);
+  box-shadow: none;
+  color: var(--ubx-text-dim);
+}
+
+html[data-ubx] .well-sm .control-label {
+  font-weight: 400;
+  font-size: var(--ubx-fs-2);
+  color: var(--ubx-text-mute);
+}
+
+html[data-ubx] .well-sm select.form-control {
+  height: 28px;
+  font-size: var(--ubx-fs-2);
+  padding: 2px 8px;
+}
+
+/* ---------- panels ---------- */
+html[data-ubx] .panel {
+  background: var(--ubx-surface);
+  border: 1px solid var(--ubx-border);
+  border-radius: var(--ubx-radius);
+  /* one pixel of light along the top edge separates the panel from the page
+     without a second border colour */
+  box-shadow: var(--ubx-hairline);
+  margin-bottom: var(--ubx-space-4);
+  overflow: hidden;
+}
+
+/* keyboard focus lands somewhere in here: show the boundary, not just the ring
+   around a 12px control inside a 900px panel */
+html[data-ubx] .panel:focus-within {
+  border-color: var(--ubx-accent-border);
+}
+
+html[data-ubx] .panel-default > .panel-heading {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--ubx-border);
+  color: var(--ubx-text);
+  font-size: var(--ubx-fs-2);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 14px 18px;
+}
+
+html[data-ubx] .panel-default > .panel-heading .badge,
+html[data-ubx] .panel-default > .panel-heading .label {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+html[data-ubx] .panel-body {
+  padding: 18px;
+  color: var(--ubx-text);
+}
+
+html[data-ubx] .panel-footer {
+  background: var(--ubx-surface-2);
+  border-top: 1px solid var(--ubx-border);
+  color: var(--ubx-text-dim);
+}
+
+html[data-ubx] .panel-primary {
+  border-color: var(--ubx-accent-border);
+}
+
+html[data-ubx] .panel-primary > .panel-heading {
+  background: var(--ubx-accent-soft);
+  border-bottom-color: var(--ubx-accent-border);
+  color: var(--ubx-accent);
+}
+
+html[data-ubx] .panel-primary > .panel-heading a {
+  color: var(--ubx-accent);
+}
+
+html[data-ubx] .panel-success > .panel-heading {
+  background: var(--ubx-ok-soft);
+  border-color: var(--ubx-accent-border);
+  color: var(--ubx-ok);
+}
+
+html[data-ubx] blockquote {
+  border-left: 3px solid var(--ubx-border-strong);
+  color: var(--ubx-text-dim);
+}
+
+html[data-ubx] pre,
+html[data-ubx] code {
+  background: var(--ubx-surface-2);
+  border-color: var(--ubx-border);
+  color: var(--ubx-text);
+  font-family: var(--ubx-font-mono);
+  border-radius: var(--ubx-radius-sm);
+}
+
+/* ---------- tables ---------- */
+html[data-ubx] table {
+  color: var(--ubx-text);
+}
+
+html[data-ubx] .table {
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+html[data-ubx] .table > thead > tr > th {
+  border-bottom: 1px solid var(--ubx-border);
+  border-top: 0;
+  color: var(--ubx-text-mute);
+  font-size: var(--ubx-fs-1);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 10px 12px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+html[data-ubx] .table > tbody > tr > td,
+html[data-ubx] .table > tbody > tr > th,
+html[data-ubx] .table > tfoot > tr > td {
+  border-top: 1px solid var(--ubx-border);
+  padding: 10px 12px;
+  vertical-align: middle;
+}
+
+html[data-ubx] .table-striped > tbody > tr:nth-of-type(odd) {
+  background: var(--ubx-row-zebra);
+}
+
+html[data-ubx] .table-hover > tbody > tr:hover {
+  background: var(--ubx-surface-3);
+  /* the row keeps a 2px accent edge on hover - the same step the chips use */
+  box-shadow: inset 2px 0 0 var(--ubx-accent-border);
+}
+
+/* numbers must not shift the column width when a digit changes */
+html[data-ubx] .table > tbody > tr > td.tabFRight,
+html[data-ubx] .table > tbody > tr > td .label,
+html[data-ubx] .table > tbody > tr > td .badge {
+  font-variant-numeric: tabular-nums;
+}
+
+/* a table that scrolls inside its panel keeps the scroll to itself */
+html[data-ubx] #data_f .panel-body > table,
+html[data-ubx] #data_f .panel-body > .table,
+html[data-ubx] .dataTables_scrollBody {
+  overscroll-behavior: contain;
+}
+
+html[data-ubx] .table > tbody > tr > td.tabFLeft {
+  text-align: left;
+}
+
+html[data-ubx] .table > tbody > tr > td.tabFRight {
+  text-align: right;
+}
+
+/* Bootstrap contextual cells: turn solid pastel blocks into readable pills */
+html[data-ubx] .table > tbody > tr > td.success,
+html[data-ubx] .table > tbody > tr > td.warning,
+html[data-ubx] .table > tbody > tr > td.danger,
+html[data-ubx] .table > tbody > tr > td.info {
+  position: relative;
+  padding-left: 24px;
+}
+
+html[data-ubx] .table > tbody > tr > td.success::before,
+html[data-ubx] .table > tbody > tr > td.warning::before,
+html[data-ubx] .table > tbody > tr > td.danger::before,
+html[data-ubx] .table > tbody > tr > td.info::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Bootstrap contextual cells: solid pastel blocks become quiet tinted text;
+   real pills are added by the chips enhancer (features/chips.js). */
+html[data-ubx] .table > tbody > tr > td.success,
+html[data-ubx] .table > tbody > tr > td.warning,
+html[data-ubx] .table > tbody > tr > td.danger,
+html[data-ubx] .table > tbody > tr > td.info {
+  background: transparent;
+}
+
+html[data-ubx] .table > tbody > tr > td.success {
+  color: var(--ubx-ok);
+}
+
+html[data-ubx] .table > tbody > tr > td.warning {
+  color: var(--ubx-warn);
+}
+
+html[data-ubx] .table > tbody > tr > td.danger {
+  color: var(--ubx-danger);
+}
+
+html[data-ubx] .table > tbody > tr > td.info {
+  color: var(--ubx-info);
+}
+html[data-ubx] .table > tbody > tr > td.success small,
+html[data-ubx] .table > tbody > tr > td.warning small,
+html[data-ubx] .table > tbody > tr > td.danger small {
+  color: inherit;
+  opacity: 0.8;
+}
+
+
+/* ---------- DataTables ---------- */
+html[data-ubx] .dataTables_wrapper {
+  color: var(--ubx-text);
+  font-size: var(--ubx-fs-3);
+}
+
+html[data-ubx] .dataTables_wrapper .dataTables_filter,
+html[data-ubx] .dataTables_wrapper .dataTables_length,
+html[data-ubx] .dataTables_wrapper .dataTables_info {
+  color: var(--ubx-text-mute);
+  font-size: var(--ubx-fs-2);
+  padding: 0;
+  margin: 0 0 var(--ubx-space-3);
+}
+
+html[data-ubx] .dataTables_wrapper .dataTables_filter label,
+html[data-ubx] .dataTables_wrapper .dataTables_length label {
+  font-weight: 400;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+html[data-ubx] .dataTables_wrapper .dataTables_filter input,
+html[data-ubx] .dataTables_wrapper .dataTables_length select {
+  background: var(--ubx-surface-2);
+  border: 1px solid var(--ubx-border);
+  border-radius: var(--ubx-radius-sm);
+  color: var(--ubx-text);
+  height: 32px;
+  padding: 4px 10px;
+  margin: 0;
+  box-shadow: none;
+}
+
+html[data-ubx] .dataTables_wrapper .dataTables_filter input:focus,
+html[data-ubx] .dataTables_wrapper .dataTables_length select:focus {
+  border-color: var(--ubx-accent-border);
+  box-shadow: var(--ubx-focus);
+  outline: 0;
+}
+
+html[data-ubx] .dataTables_wrapper .dataTables_paginate {
+  margin-top: var(--ubx-space-3);
+}
+
+html[data-ubx] .dataTables_wrapper .dataTables_paginate .pagination {
+  display: inline-flex;
+  gap: 6px;
+  margin: 0;
+}
+
+html[data-ubx] .dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+html[data-ubx] .dataTables_wrapper .dataTables_paginate .paginate_button > a {
+  display: block;
+  background: var(--ubx-surface-2);
+  border: 1px solid var(--ubx-border);
+  border-radius: var(--ubx-radius-sm);
+  color: var(--ubx-text-dim) !important;
+  padding: 5px 12px;
+  font-size: var(--ubx-fs-2);
+  line-height: 1.4;
+}
+
+html[data-ubx] .dataTables_wrapper .dataTables_paginate .paginate_button > a:hover {
+  background: var(--ubx-surface-3);
+  border-color: var(--ubx-border-strong);
+  color: var(--ubx-text) !important;
+}
+
+html[data-ubx] .dataTables_wrapper .dataTables_paginate .paginate_button.current > a,
+html[data-ubx] .dataTables_wrapper .dataTables_paginate .paginate_button.current > a:hover {
+  background: var(--ubx-accent);
+  border-color: var(--ubx-accent);
+  color: var(--ubx-accent-ink) !important;
+  font-weight: 600;
+}
+
+html[data-ubx] .dataTables_wrapper .dataTables_paginate .paginate_button.disabled > a,
+html[data-ubx] .dataTables_wrapper .dataTables_paginate .paginate_button.disabled > a:hover {
+  background: transparent;
+  border-color: var(--ubx-border);
+  color: var(--ubx-text-mute) !important;
+  opacity: 0.5;
+}
+
+html[data-ubx] .dt-buttons {
+  display: inline-flex;
+  gap: 6px;
+}
+
+html[data-ubx] .dt-buttons .btn {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* stock DataTables buttons carry bootstrap glyphicons on the anchor itself;
+   inside the flex row the glyph is a plain item instead of an overlay */
+html[data-ubx] .dt-buttons .btn.glyphicon {
+  font-family: var(--ubx-font);
+  padding: 6px 14px 6px 12px;
+  font-size: var(--ubx-fs-3);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  min-height: 34px;
+}
+
+html[data-ubx] .dt-buttons .btn.glyphicon::before {
+  position: static;
+  top: 0;
+  font-family: "Glyphicons Halflings";
+  font-size: var(--ubx-fs-2);
+  line-height: 1;
+  opacity: 0.75;
+}
+
+html[data-ubx] .dt-buttons .btn.glyphicon:hover::before {
+  opacity: 1;
+  color: var(--ubx-accent);
+}
+
+/* "Show/hide columns" has no glyphicon */
+html[data-ubx] .dt-buttons .btn:not(.glyphicon) {
+  min-height: 34px;
+  font-size: var(--ubx-fs-3);
+  font-weight: 400;
+}
+
+html[data-ubx] .dataTables_wrapper table.dataTable thead .sorting,
+html[data-ubx] .dataTables_wrapper table.dataTable thead .sorting_asc,
+html[data-ubx] .dataTables_wrapper table.dataTable thead .sorting_desc {
+  background-image: none;
+  cursor: pointer;
+  position: relative;
+  padding-right: 20px;
+}
+
+html[data-ubx] .dataTables_wrapper table.dataTable thead th.sorting::after,
+html[data-ubx] .dataTables_wrapper table.dataTable thead th.sorting_asc::after,
+html[data-ubx] .dataTables_wrapper table.dataTable thead th.sorting_desc::after {
+  content: "\2195";
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--ubx-fs-1);
+  opacity: 0.45;
+}
+
+html[data-ubx] .dataTables_wrapper table.dataTable thead th.sorting_asc::after {
+  content: "\2191";
+  opacity: 1;
+  color: var(--ubx-accent);
+}
+
+/* ---------- statistics layout ---------- */
+/* The stock template stacks three panels (usage, table, pie) and wraps the
+   table in a col-lg-8 that leaves a third of the row empty. Two columns fill
+   the page instead: usage on top, the numbers next to the pie. */
+html[data-ubx-view="statistics"] #data_f {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: var(--ubx-space-4);
+  align-items: start;
+}
+
+html[data-ubx-view="statistics"] #data_f > .panel {
+  margin-bottom: 0;
+  min-width: 0;
+}
+
+html[data-ubx-view="statistics"] #data_f > .panel:first-child {
+  grid-column: 1 / -1;
+}
+
+html[data-ubx-view="statistics"] #data_f .row > [class*="col-"] {
+  width: 100%;
+  float: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+html[data-ubx-view="statistics"] #data_f .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+html[data-ubx-view="statistics"] #data_f #statistics_table {
+  margin-bottom: var(--ubx-space-4);
+}
+
+/* ---------- buttons ---------- */
+html[data-ubx] .btn {
+  border-radius: var(--ubx-radius-sm);
+  border: 1px solid var(--ubx-border);
+  background: var(--ubx-surface-2);
+  color: var(--ubx-text);
+  font-size: var(--ubx-fs-3);
+  /* 400, not 500: see the font-synthesis note on `body` - a 500 in this font
+     stack is a synthetic face and every toolbar label looked smeared. Emphasis
+     comes from the surface, the border and .btn-primary's real 600. */
+  font-weight: 400;
+  padding: 6px 14px;
+  box-shadow: none;
+  /* The stock theme embosses every button label: `bootstrap-theme.min.css` has
+     `.btn-default{text-shadow:0 1px 0 #fff}` and
+     `.btn-primary,.btn-danger,...{text-shadow:0 -1px 0 rgba(0,0,0,.2)}` - a trick
+     for the light UI. On this dark surface the white copy painted one pixel under
+     each glyph is a second, blurry outline, so a 13px label looks bold, dirty and
+     "pixelated" while the very same word in a table cell looks clean. Nothing in
+     this theme needs a text shadow, so the emboss goes. */
+  text-shadow: none;
+  touch-action: manipulation;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.06s steps(1, end);
+}
+
+/* A dropdown button ends with a Bootstrap caret: `width: 0; height: 0` plus 4px
+   transparent side borders. Only the *borders* draw, so the box reserves no room
+   and the triangle is painted straight onto the last letter ("Windows<caret>").
+   Give it a real 8px border-box (4px + 4px of side border, no content) and a gap
+   of its own. Border colours stay stock - a .dropup flips them in Bootstrap, so
+   this rule only touches the box. */
+html[data-ubx] .btn > .caret,
+html[data-ubx] .btn-group > .btn > .caret {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 4px;
+  margin-left: 7px;
+  vertical-align: 1px;
+}
+
+/* bootstrap-select wraps the triangle in `.bs-caret` and positions it
+   absolutely (`.caret { position: absolute; right: 12px; margin-top: -2px }`),
+   so the rule above never reaches it: the label (`width: 100%` of the content
+   box) runs underneath. Stock bootstrap-select reserves `padding-right: 25px`
+   on the toggle for exactly this, but `.btn`'s own 14px padding outranks it -
+   the triangle then sits *on* the last letter ("Incremental file backup|").
+   Put the room back, a little wider than stock because this theme's caret keeps
+   its full 8px box. */
+html[data-ubx] .bootstrap-select.btn-group > .dropdown-toggle {
+  padding-right: 26px;
+}
+
+/* One direction for every toolbar menu. UrBackup's own template hard-codes
+   `<div class="btn-group dropup">` for "With Selected" (templates.js,
+   status_modify_clients), so that one menu opened upward over the filter row
+   while every neighbouring menu opened down - it looked like a different kind
+   of control. The class is markup, not a "there is no room below" answer, and
+   the toolbar always has the table under it, so point the menus down again and
+   flip the triangle back with them. `.bootstrap-select` is excluded on purpose:
+   there the class is added by the plugin after it measured the viewport, and
+   overriding it would push a menu off-screen. */
+html[data-ubx] .btn-group.dropup:not(.bootstrap-select) > .dropdown-menu,
+html[data-ubx] .btn-group.dropup:not(.bootstrap-select) .dropdown-menu {
+  top: 100%;
+  bottom: auto;
+  margin-top: 2px;
+  margin-bottom: 0;
+}
+
+html[data-ubx] .btn-group.dropup:not(.bootstrap-select) > .btn > .caret,
+html[data-ubx] .btn-group.dropup:not(.bootstrap-select) .btn > .caret {
+  border-top: 4px solid;
+  border-bottom: 0;
+}
+
+html[data-ubx] .btn:hover,
+html[data-ubx] .btn:focus {
+  background: var(--ubx-surface-3);
+  border-color: var(--ubx-border-strong);
+  color: var(--ubx-text);
+  outline: 0;
+}
+
+html[data-ubx] .btn:active,
+html[data-ubx] .btn.active {
+  background: var(--ubx-surface-3);
+  border-color: var(--ubx-accent-border);
+  color: var(--ubx-text);
+  box-shadow: none;
+}
+
+html[data-ubx] .btn:active {
+  /* pressed feedback moves one pixel, the same step the glyphs use */
+  transform: translateY(1px);
+}
+
+html[data-ubx] .btn:focus-visible {
+  /* one ring only: the accent outline from the accessibility block. A shadow
+     ring here would draw a second, tighter ring inside it. */
+  outline-offset: 2px;
+}
+
+html[data-ubx] .btn-default {
+  background: var(--ubx-surface-2);
+  border-color: var(--ubx-border);
+  color: var(--ubx-text-dim);
+}
+
+html[data-ubx] .btn-default:hover,
+html[data-ubx] .btn-default:focus {
+  background: var(--ubx-surface-3);
+  border-color: var(--ubx-border-strong);
+  color: var(--ubx-text);
+}
+
+/* The main button carries the logo blue (primary), not the accent: it has to
+   read as the strongest fill on the page, and light ink on #1046ae is 6.99:1. */
+html[data-ubx] .btn-primary {
+  background: var(--ubx-primary);
+  border-color: var(--ubx-primary);
+  color: var(--ubx-on-primary);
+  font-weight: 600;
+}
+
+html[data-ubx] .btn-primary:hover,
+html[data-ubx] .btn-primary:focus {
+  background: var(--ubx-primary-hover);
+  border-color: var(--ubx-primary-hover);
+  color: var(--ubx-on-primary);
+}
+
+html[data-ubx] .btn-primary:active,
+html[data-ubx] .btn-primary.active {
+  background: var(--ubx-primary-press);
+  border-color: var(--ubx-primary-press);
+  color: var(--ubx-on-primary);
+}
+
+html[data-ubx] .btn-danger {
+  background: var(--ubx-danger);
+  border-color: var(--ubx-danger);
+  /* dark ink: 5.28:1, white is 3.7:1 on #e5534b */
+  color: var(--ubx-ink);
+}
+
+html[data-ubx] .btn-danger:hover,
+html[data-ubx] .btn-danger:focus,
+html[data-ubx] .btn-danger:active {
+  background: var(--ubx-danger);
+  border-color: var(--ubx-danger);
+  color: var(--ubx-ink);
+  filter: brightness(1.08);
+}
+
+html[data-ubx] .btn-warning {
+  background: var(--ubx-warn);
+  border-color: var(--ubx-warn);
+  color: var(--ubx-ink);
+}
+
+html[data-ubx] .btn-success {
+  background: var(--ubx-ok);
+  border-color: var(--ubx-ok);
+  color: var(--ubx-ink);
+}
+
+html[data-ubx] .btn-link {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ubx-accent);
+}
+
+html[data-ubx] .btn-xs {
+  padding: 2px 10px;
+  font-size: var(--ubx-fs-1);
+  border-radius: 6px;
+}
+
+html[data-ubx] .btn-sm {
+  padding: 4px 12px;
+  font-size: var(--ubx-fs-2);
+}
+
+html[data-ubx] .btn-group > .btn + .btn,
+html[data-ubx] .btn-group .btn {
+  margin-left: 0;
+}
+
+html[data-ubx] .open > .dropdown-toggle.btn-default,
+html[data-ubx] .open > .dropdown-toggle.btn-default:hover,
+html[data-ubx] .open > .dropdown-toggle.btn-default:focus {
+  background: var(--ubx-surface-3);
+  border-color: var(--ubx-border-strong);
+  color: var(--ubx-text);
+}
+
+/* ---------- forms ---------- */
+html[data-ubx] .form-control {
+  background: var(--ubx-surface-2);
+  border: 1px solid var(--ubx-border);
+  border-radius: var(--ubx-radius-sm);
+  color: var(--ubx-text);
+  box-shadow: none;
+  font-size: var(--ubx-fs-3);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+html[data-ubx] .form-control::placeholder {
+  color: var(--ubx-text-mute);
+}
+
+html[data-ubx] .form-control:hover:not(:focus) {
+  border-color: var(--ubx-border-strong);
+}
+
+html[data-ubx] .form-control:focus {
+  background: var(--ubx-surface-2);
+  border-color: var(--ubx-accent-border);
+  box-shadow: var(--ubx-focus);
+  color: var(--ubx-text);
+  outline: 0;
+}
+
+html[data-ubx] .form-control[disabled],
+html[data-ubx] .form-control[readonly],
+html[data-ubx] fieldset[disabled] .form-control {
+  background: var(--ubx-surface);
+  color: var(--ubx-text-mute);
+}
+
+html[data-ubx] .input-group-addon {
+  background: var(--ubx-surface-3);
+  border-color: var(--ubx-border);
+  color: var(--ubx-text-dim);
+  border-radius: var(--ubx-radius-sm);
+  font-size: var(--ubx-fs-2);
+}
+
+html[data-ubx] .form-control-static {
+  color: var(--ubx-text-dim);
+  font-size: var(--ubx-fs-3);
+  padding-top: 7px;
+  padding-bottom: 7px;
+  min-height: 0;
+}
+
+html[data-ubx] .control-label {
+  color: var(--ubx-text-dim);
+  font-size: var(--ubx-fs-3);
+  /* real 600 (stock Bootstrap asks for 700 here): a 500 would be synthetic */
+  font-weight: 600;
+}
+
+html[data-ubx] .form-horizontal .control-label {
+  padding-top: 8px;
+}
+
+html[data-ubx] .form-horizontal .form-group {
+  margin-bottom: 12px;
+}
+
+html[data-ubx] .help-block {
+  color: var(--ubx-text-mute);
+  font-size: var(--ubx-fs-2);
+}
+
+html[data-ubx] .has-error .form-control {
+  border-color: var(--ubx-danger);
+}
+
+html[data-ubx] .has-error .help-block,
+html[data-ubx] .has-error .control-label {
+  color: var(--ubx-danger);
+}
+
+html[data-ubx] .checkbox label,
+html[data-ubx] .radio label,
+html[data-ubx] .checkbox-inline,
+html[data-ubx] .radio-inline {
+  color: var(--ubx-text-dim);
+  font-size: var(--ubx-fs-3);
+}
+
+html[data-ubx] input[type="checkbox"],
+html[data-ubx] input[type="radio"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  vertical-align: -4px;
+  background: var(--ubx-surface-2);
+  border: 1px solid var(--ubx-border-strong);
+  border-radius: 5px;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+html[data-ubx] input[type="radio"] {
+  border-radius: 50%;
+}
+
+html[data-ubx] input[type="checkbox"]:hover,
+html[data-ubx] input[type="radio"]:hover {
+  border-color: var(--ubx-accent-border);
+}
+
+html[data-ubx] input[type="checkbox"]:checked {
+  background-color: var(--ubx-accent);
+  border-color: var(--ubx-accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%2304150c' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' d='M3.4 8.4 6.3 11.3 12.6 4.9'/%3E%3C/svg%3E");
+  background-size: 13px 13px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+html[data-ubx] input[type="radio"]:checked {
+  background-color: var(--ubx-accent);
+  border-color: var(--ubx-accent);
+  box-shadow: inset 0 0 0 4px var(--ubx-surface);
+}
+
+html[data-ubx] .checkbox input[type="checkbox"],
+html[data-ubx] .radio input[type="radio"] {
+  margin-left: -22px;
+  margin-top: 1px;
+}
+
+html[data-ubx] .toggle.btn {
+  border-radius: var(--ubx-radius-pill);
+}
+
+
+html[data-ubx] .dataTables_wrapper table.dataTable thead th.sorting_desc::after {
+  content: "\2193";
+  opacity: 1;
+  color: var(--ubx-accent);
+}
+
+/* keep the header aligned with the body table: DataTables positions the head
+   itself (inline position: relative), so sticky must not be forced here */
+html[data-ubx] .dataTables_scrollHead {
+  background: var(--ubx-surface);
+}
+
+html[data-ubx] .dataTables_scrollBody {
+  background: var(--ubx-surface);
+}
+
+
+/* ---------- navigation (settings tabs) ---------- */
+html[data-ubx] .nav > li > a {
+  color: var(--ubx-text-dim);
+  border-radius: var(--ubx-radius-sm);
+  padding: 7px 12px;
+  font-size: var(--ubx-fs-3);
+}
+
+html[data-ubx] .nav > li > a:hover,
+html[data-ubx] .nav > li > a:focus {
+  background: var(--ubx-surface-2);
+  color: var(--ubx-text);
+}
+
+html[data-ubx] .nav-pills > li > a {
+  border: 1px solid transparent;
+}
+
+html[data-ubx] .nav-pills > li.active > a,
+html[data-ubx] .nav-pills > li.active > a:hover,
+html[data-ubx] .nav-pills > li.active > a:focus {
+  background: var(--ubx-accent-soft);
+  border-color: var(--ubx-accent-border);
+  color: var(--ubx-accent);
+  font-weight: 600;
+}
+
+html[data-ubx] .nav-tabs {
+  border-bottom-color: var(--ubx-border);
+}
+
+html[data-ubx] .nav-tabs > li > a {
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  margin-bottom: -1px;
+  color: var(--ubx-text-mute);
+}
+
+html[data-ubx] .nav-tabs > li.active > a,
+html[data-ubx] .nav-tabs > li.active > a:hover,
+html[data-ubx] .nav-tabs > li.active > a:focus {
+  background: transparent;
+  border-color: transparent;
+  border-bottom-color: var(--ubx-accent);
+  color: var(--ubx-text);
+}
+
+html[data-ubx] .tab-content {
+  padding-top: var(--ubx-space-3);
+}
+
+/* ---------- dropdowns / bootstrap-select ---------- */
+html[data-ubx] .dropdown-menu {
+  background: var(--ubx-surface);
+  border: 1px solid var(--ubx-border);
+  border-radius: var(--ubx-radius-sm);
+  box-shadow: var(--ubx-shadow);
+  padding: 6px;
+  min-width: 160px;
+}
+
+html[data-ubx] .dropdown-menu > li > a {
+  color: var(--ubx-text-dim);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: var(--ubx-fs-3);
+}
+
+html[data-ubx] .dropdown-menu > li > a:hover,
+html[data-ubx] .dropdown-menu > li > a:focus {
+  background: var(--ubx-surface-3);
+  color: var(--ubx-text);
+}
+
+html[data-ubx] .dropdown-menu > .active > a,
+html[data-ubx] .dropdown-menu > .active > a:hover,
+html[data-ubx] .dropdown-menu > .active > a:focus {
+  background: var(--ubx-accent-soft);
+  color: var(--ubx-accent);
+}
+
+html[data-ubx] .dropdown-menu .divider {
+  background: var(--ubx-border);
+}
+
+html[data-ubx] .bootstrap-select .dropdown-toggle {
+  background: var(--ubx-surface-2);
+  border: 1px solid var(--ubx-border);
+  color: var(--ubx-text-dim);
+  border-radius: var(--ubx-radius-sm);
+  font-size: var(--ubx-fs-3);
+}
+
+html[data-ubx] .bootstrap-select.btn-group .dropdown-toggle .caret {
+  border-top-color: var(--ubx-text-mute);
+  border-bottom-color: var(--ubx-text-mute);
+}
+
+html[data-ubx] .bootstrap-select .bs-searchbox .form-control {
+  font-size: var(--ubx-fs-2);
+  height: 30px;
+}
+
+html[data-ubx] .dropdown-menu.inner > li.selected > a .check-mark {
+  color: var(--ubx-accent);
+}
+
+/* A panel clips its own corners (`overflow: hidden` in the panel block), so a
+   menu whose trigger sits near the panel's bottom edge is cut off: on the status
+   page the "With Selected" list opened down into the border and its items were
+   invisible as soon as the client table below was short (measured with
+   scratch/probe-status-menu.mjs - the menu ended 33px below the panel box). The
+   clip is only released while a menu is open, so the closed layout keeps its
+   rounded corners and the table's bottom edge. */
+html[data-ubx] .panel:has(.btn-group.open),
+html[data-ubx] .panel:has(.bootstrap-select.open) {
+  overflow: visible;
+}
+
+
+/* ---------- alerts / labels / badges ---------- */
+html[data-ubx] .alert {
+  border-radius: var(--ubx-radius-sm);
+  border: 1px solid var(--ubx-border);
+  background: var(--ubx-surface-2);
+  color: var(--ubx-text);
+  font-size: var(--ubx-fs-3);
+  /* `.alert{text-shadow:0 1px 0 rgba(255,255,255,.2)}` in the stock theme */
+  text-shadow: none;
+}
+
+html[data-ubx] .alert-info {
+  border-color: var(--ubx-info);
+  background: var(--ubx-info-soft);
+  color: var(--ubx-info);
+}
+
+html[data-ubx] .alert-success {
+  border-color: var(--ubx-accent-border);
+  background: var(--ubx-ok-soft);
+  color: var(--ubx-ok);
+}
+
+html[data-ubx] .alert-warning {
+  border-color: var(--ubx-warn);
+  background: var(--ubx-warn-soft);
+  color: var(--ubx-warn);
+}
+
+html[data-ubx] .alert-danger {
+  border-color: var(--ubx-danger);
+  background: var(--ubx-danger-soft);
+  color: var(--ubx-danger);
+}
+
+html[data-ubx] .label {
+  border-radius: var(--ubx-radius-pill);
+  font-size: var(--ubx-fs-1);
+  font-weight: 600;
+  padding: 3px 8px;
+}
+
+html[data-ubx] .label-default {
+  background: var(--ubx-surface-3);
+  color: var(--ubx-text-dim);
+}
+
+html[data-ubx] .label-success {
+  background: var(--ubx-ok-soft);
+  color: var(--ubx-ok);
+}
+
+html[data-ubx] .label-warning {
+  background: var(--ubx-warn-soft);
+  color: var(--ubx-warn);
+}
+
+html[data-ubx] .label-danger {
+  background: var(--ubx-danger-soft);
+  color: var(--ubx-danger);
+}
+
+html[data-ubx] .badge {
+  background: var(--ubx-surface-3);
+  color: var(--ubx-text-dim);
+  border-radius: var(--ubx-radius-pill);
+}
+
+/* ---------- modals ---------- */
+html[data-ubx] .modal-content {
+  background: var(--ubx-surface);
+  border: 1px solid var(--ubx-border);
+  border-radius: var(--ubx-radius);
+  box-shadow: var(--ubx-shadow-pop);
+  color: var(--ubx-text);
+}
+
+/* a scroll that reaches the end of a dialog or menu must not continue in the
+   page behind it */
+html[data-ubx] .modal,
+html[data-ubx] .modal-body,
+html[data-ubx] .dropdown-menu {
+  overscroll-behavior: contain;
+}
+
+html[data-ubx] .modal-header,
+html[data-ubx] .modal-footer {
+  border-color: var(--ubx-border);
+}
+
+html[data-ubx] .modal-header {
+  padding: 16px 20px;
+}
+
+html[data-ubx] .modal-title {
+  font-size: var(--ubx-fs-5);
+  font-weight: 600;
+}
+
+html[data-ubx] .modal-body {
+  padding: 20px;
+}
+
+html[data-ubx] .modal-footer {
+  background: var(--ubx-surface-2);
+  border-radius: 0 0 var(--ubx-radius) var(--ubx-radius);
+}
+
+html[data-ubx] .modal-backdrop.in {
+  opacity: 0.65;
+  background: #05080e;
+}
+
+html[data-ubx] .close {
+  color: var(--ubx-text-mute);
+  opacity: 0.8;
+  text-shadow: none;
+}
+
+html[data-ubx] .close:hover {
+  color: var(--ubx-text);
+  opacity: 1;
+}
+
+/* ---------- progress ---------- */
+html[data-ubx] .progress {
+  background: var(--ubx-surface-3);
+  border: 0;
+  border-radius: var(--ubx-radius-pill);
+  box-shadow: none;
+  height: 16px;
+  margin-bottom: 4px;
+  overflow: hidden;
+}
+
+html[data-ubx] .progress-bar {
+  background-image: none;
+  background-color: var(--ubx-accent);
+  color: var(--ubx-accent-ink);
+  font-size: var(--ubx-fs-1);
+  font-weight: 600;
+  line-height: 16px;
+  box-shadow: none;
+}
+
+html[data-ubx] .progress-bar-success {
+  background-color: var(--ubx-ok);
+}
+
+html[data-ubx] .progress-bar-warning {
+  background-color: var(--ubx-warn);
+  color: var(--ubx-ink);
+}
+
+html[data-ubx] .progress-bar-danger {
+  background-color: var(--ubx-danger);
+  color: var(--ubx-ink);
+}
+
+html[data-ubx] .progress-bar-info {
+  background-color: var(--ubx-info);
+  color: var(--ubx-ink);
+}
+
+
+/* plain Bootstrap pagination (backup lists) */
+html[data-ubx] .pagination {
+  display: inline-flex;
+  gap: 6px;
+  margin: var(--ubx-space-3) 0 0;
+}
+
+html[data-ubx] .pagination > li > a,
+html[data-ubx] .pagination > li > span {
+  background: var(--ubx-surface-2);
+  border: 1px solid var(--ubx-border);
+  border-radius: var(--ubx-radius-sm) !important;
+  color: var(--ubx-text-dim);
+  font-size: var(--ubx-fs-2);
+  padding: 5px 12px;
+  margin: 0;
+  float: none;
+}
+
+html[data-ubx] .pagination > li > a:hover,
+html[data-ubx] .pagination > li > a:focus {
+  background: var(--ubx-surface-3);
+  border-color: var(--ubx-border-strong);
+  color: var(--ubx-text);
+}
+
+html[data-ubx] .pagination > .active > a,
+html[data-ubx] .pagination > .active > a:hover,
+html[data-ubx] .pagination > .active > span {
+  background: var(--ubx-accent);
+  border-color: var(--ubx-accent);
+  color: var(--ubx-accent-ink);
+  font-weight: 600;
+}
+
+html[data-ubx] .pagination > .disabled > a,
+html[data-ubx] .pagination > .disabled > span {
+  background: transparent;
+  border-color: var(--ubx-border);
+  color: var(--ubx-text-mute);
+}
+
+/* ---------- misc ---------- */
+html[data-ubx] .glyphicon {
+  color: inherit;
+}
+
+html[data-ubx] #nprogress .bar {
+  background: var(--ubx-accent);
+  height: 3px;
+}
+
+html[data-ubx] #nprogress .spinner-icon {
+  border-top-color: var(--ubx-accent);
+  border-left-color: var(--ubx-accent);
+}
+
+html[data-ubx] .jqplot-target {
+  color: var(--ubx-text-dim) !important;
+  font-family: var(--ubx-font) !important;
+  font-size: var(--ubx-fs-1) !important;
+  margin: 2px 0 4px;
+}
+
+html[data-ubx] .jqplot-title {
+  color: var(--ubx-text) !important;
+  font-size: var(--ubx-fs-3) !important;
+  font-weight: 600 !important;
+}
+
+html[data-ubx] .jqplot-table-legend {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--ubx-text-dim) !important;
+  padding: 0 !important;
+}
+
+html[data-ubx] .jqplot-table-legend td {
+  color: var(--ubx-text-dim) !important;
+  font-size: var(--ubx-fs-2);
+  padding: 2px 6px 2px 0 !important;
+}
+
+html[data-ubx] .jqplot-table-legend tr,
+html[data-ubx] .jqplot-table-legend td {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+html[data-ubx] .jqplot-highlighter-tooltip,
+html[data-ubx] .jqplot-cursor-tooltip {
+  background: var(--ubx-surface-2) !important;
+  border: 1px solid var(--ubx-border-strong) !important;
+  border-radius: var(--ubx-radius-sm) !important;
+  color: var(--ubx-text) !important;
+  font-family: var(--ubx-font) !important;
+  font-size: var(--ubx-fs-2) !important;
+  padding: 6px 10px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45) !important;
+  opacity: 1 !important;
+}
+
+html[data-ubx] .jqplot-axis,
+html[data-ubx] .jqplot-xaxis-label,
+html[data-ubx] .jqplot-yaxis-label,
+html[data-ubx] .jqplot-y2axis-label {
+  color: var(--ubx-text-dim) !important;
+  font-size: var(--ubx-fs-1) !important;
+}
+
+/* "No entries for this filter" and similar full-width table cells */
+html[data-ubx] td[colspan] {
+  color: var(--ubx-text-mute);
+  font-size: var(--ubx-fs-3);
+  padding: 22px 12px !important;
+  text-align: center;
+  background: transparent !important;
+}
+
+html[data-ubx] td.tabFRight[colspan] {
+  text-align: center;
+}
+
+html[data-ubx] .text-muted {
+  color: var(--ubx-text-mute);
+}
+
+html[data-ubx] .text-danger {
+  color: var(--ubx-danger);
+}
+
+html[data-ubx] .text-success {
+  color: var(--ubx-ok);
+}
+
+html[data-ubx] .text-warning {
+  color: var(--ubx-warn);
+}
+
+html[data-ubx] .table .progress {
+  margin-bottom: 4px;
+}
+
+html[data-ubx] .table .progress + div {
+  font-size: var(--ubx-fs-1);
+  color: var(--ubx-text-mute);
+  font-family: var(--ubx-font-mono);
+}
+
+/* ---------- feature: pixel icons ---------- */
+/* UrBackup rebuilds the navbar on every view switch, so the glyphs are gone for
+   a frame before icons.js puts them back. The slot is reserved by the anchor's
+   padding and the glyph is taken out of the flow: inserting or losing it never
+   reflows the tab row (the row used to shrink by 21px per tab and snap back). */
+html[data-ubx] #main_nav > li > a {
+  position: relative;
+  padding-left: 35px;
+}
+
+html[data-ubx] #main_nav .ubx-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0;
+  fill: currentColor;
+  opacity: 0.45;
+  transition: opacity 0.15s ease;
+}
+
+html[data-ubx] #main_nav > li > a:hover .ubx-icon,
+html[data-ubx] #main_nav > li > a:focus .ubx-icon {
+  opacity: 0.8;
+}
+
+html[data-ubx] #main_nav > li.active > a .ubx-icon {
+  opacity: 1;
+  color: var(--ubx-accent);
+}
+
+/* ---------- feature: status chips ---------- */
+html[data-ubx] .ubx-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 2px 10px 2px 8px;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-radius: var(--ubx-radius-pill);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  font-size: var(--ubx-fs-2);
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+html[data-ubx] .ubx-chip::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+html[data-ubx] .ubx-chip--ok { color: var(--ubx-ok); }
+html[data-ubx] .ubx-chip--warn { color: var(--ubx-warn); }
+html[data-ubx] .ubx-chip--danger { color: var(--ubx-danger); }
+html[data-ubx] .ubx-chip--info { color: var(--ubx-info); }
+
+/* the chip carries its own dot, so drop the plain-text marker */
+html[data-ubx] .table > tbody > tr > td.ubx-chipped {
+  padding-left: 12px;
+}
+
+html[data-ubx] .table > tbody > tr > td.ubx-chipped::before {
+  display: none;
+}
+
+/* ---------- feature: sticky settings navigation ---------- */
+/* #nav_pos lives inside .pos_bar, and a sticky child is confined to its
+   parent's box - so the wrapper is what has to stick. */
+html[data-ubx] .pos_bar:has(> #nav_pos:not(:empty)) {
+  position: sticky;
+  top: var(--ubx-navbar-offset);
+  z-index: 30;
+  margin: 0 0 6px;
+  padding: 10px 0 6px;
+  background: var(--ubx-bg);
+  border-bottom: 1px solid var(--ubx-border);
+}
+
+html[data-ubx] #settings_tabber.ubx-sticky-tabs {
+  position: sticky;
+  top: calc(var(--ubx-navbar-offset) + 42px);
+  z-index: 25;
+  padding: 6px 0;
+  margin-bottom: 6px;
+  background: var(--ubx-bg);
+  border-bottom: 1px solid var(--ubx-border);
+}
+
+/* ---------- feature: empty states ---------- */
+html[data-ubx] .ubx-empty-table td.dataTables_empty {
+  padding: 46px 16px !important;
+  background: transparent;
+  color: var(--ubx-text-mute);
+  font-size: var(--ubx-fs-3);
+  text-align: center;
+  /* no single-word last line in a two-line empty state */
+  text-wrap: pretty;
+}
+
+html[data-ubx] .ubx-empty-table td.dataTables_empty::before {
+  content: "—";
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ubx-border-strong);
+  font-size: 20px;
+  line-height: 1;
+}
+
+html[data-ubx] .ubx-empty-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96px;
+}
+
+html[data-ubx] .ubx-empty-panel::after {
+  content: "—";
+  color: var(--ubx-text-mute);
+}
+
+/* ---------- feature: unsaved settings field ---------- */
+html[data-ubx] .form-group.ubx-dirty {
+  position: relative;
+}
+
+html[data-ubx] .form-group.ubx-dirty::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--ubx-warn);
+}
+
+/* ---------- motion: pixel-style micro animations ---------- */
+/* Deliberately CSS-only and small: transform/opacity on single elements, stepped
+   timing so the motion matches the 1px glyphs, and nothing that animates inside
+   table rows (a 2000-row folder has to stay cheap). The global
+   prefers-reduced-motion rule below collapses all of it to 0.01ms. No SMIL:
+   <animate> cannot be switched off by that media query. */
+
+@keyframes ubx-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.7); opacity: 0.45; }
+}
+
+@keyframes ubx-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes ubx-stripes {
+  from { background-position: 0 0; }
+  to { background-position: 16px 0; }
+}
+
+/* a failed backup pulses, so the status page reads at a glance */
+html[data-ubx] .ubx-chip--danger::before {
+  animation: ubx-pulse 1.6s steps(2, end) infinite;
+}
+
+/* empty tables get a blinking pixel cursor instead of a static dash */
+html[data-ubx] .ubx-empty-table td.dataTables_empty::before {
+  content: "";
+  width: 7px;
+  height: 12px;
+  margin: 0 auto 10px;
+  background: var(--ubx-border-strong);
+  animation: ubx-blink 1.2s steps(1, end) infinite;
+}
+
+/* A section switch is painted in pieces: the server swaps #data_f, DataTables
+   re-measures its columns and jqplot re-creates the pie a frame or two later.
+   Fading in the first paint put that jump *inside* the fade (measured with
+   scratch/probe-view-flash.mjs: three layouts in the first 200ms while the fade
+   started at 240ms, so the page snapped and then faded). ubx.js#holdView keeps
+   the container transparent until its geometry has been stable for a few
+   samples; the released block fades in once, with its panels rising in a short
+   stagger. Rows never animate - a 2000-row folder has to stay cheap. */
+html[data-ubx] #data_f.ubx-view-pending {
+  opacity: 0;
+}
+
+html[data-ubx] #data_f.ubx-view-enter {
+  animation: ubx-view-in 220ms ease-out 1;
+}
+
+@keyframes ubx-view-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+html[data-ubx] #data_f.ubx-view-enter > .panel,
+html[data-ubx] #data_f.ubx-view-enter > .row > [class*="col-"] > .panel {
+  /* backwards, not both: the delayed panels must start invisible, but a finished
+     animation must not keep the panel as a filled target (a permanent fill keeps
+     the element composited, which changes how its text is antialiased) */
+  animation: ubx-panel-in 260ms ease-out backwards;
+}
+
+/* a two-step stagger is enough to read as "in order" and keeps the last panel
+   from waiting; everything deeper is already covered by the block fade */
+html[data-ubx] #data_f.ubx-view-enter > .panel:nth-child(n + 2),
+html[data-ubx] #data_f.ubx-view-enter > .row > [class*="col-"]:nth-child(n + 2) > .panel {
+  animation-delay: 45ms;
+}
+
+html[data-ubx] #data_f.ubx-view-enter > .panel:nth-child(n + 3),
+html[data-ubx] #data_f.ubx-view-enter > .row > [class*="col-"]:nth-child(n + 3) > .panel {
+  animation-delay: 90ms;
+}
+
+@keyframes ubx-panel-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* running backups: the familiar moving stripe, painted over the bar */
+html[data-ubx] .progress-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+html[data-ubx] .progress-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.16) 0 8px,
+    transparent 8px 16px
+  );
+  animation: ubx-stripes 1s linear infinite;
+}
+
+/* file glyphs nudge on row hover (one glyph, not the whole row) */
+html[data-ubx] .ubx-files > tbody > tr > td:first-child svg.ubx-icon {
+  transition: transform 0.12s steps(2, end);
+}
+
+html[data-ubx] .ubx-files > tbody > tr:hover > td:first-child svg.ubx-icon {
+  transform: translateY(-1px);
+}
+
+/* ---------- accessibility / motion ---------- */
+html[data-ubx] a:focus-visible,
+html[data-ubx] button:focus-visible,
+html[data-ubx] input:focus-visible,
+html[data-ubx] select:focus-visible,
+html[data-ubx] .btn:focus-visible {
+  outline: 2px solid var(--ubx-accent);
+  outline-offset: 2px;
+}
+
+/* "Skip to content" - inserted once by ubx.js#markSkipLink, hidden until it is
+   focused with the keyboard */
+html[data-ubx] .ubx-skip {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 1080;
+  padding: 8px 14px;
+  border: 1px solid var(--ubx-accent);
+  border-radius: var(--ubx-radius-sm);
+  background: var(--ubx-surface-2);
+  color: var(--ubx-text);
+  font-size: var(--ubx-fs-3);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform 0.12s steps(3, end);
+}
+
+html[data-ubx] .ubx-skip:focus-visible {
+  transform: none;
+  text-decoration: none;
+}
+
+/* The jump target only needs to receive the caret; a ring around the whole
+   content area would look like a bug, and the next Tab continues inside it. */
+html[data-ubx] #data_f:focus {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ubx] *,
+  html[data-ubx] *::before,
+  html[data-ubx] *::after {
+    transition-duration: 0.01ms !important;
+    /* an endless animation with a 0.01ms duration still asks for frames; stop
+       them outright instead of fast-forwarding them forever */
+    animation: none !important;
+  }
+}
+
+/* ---------- feature: file browser ---------- */
+html[data-ubx] #data_f .panel-heading,
+html[data-ubx] #data_f .panel-heading a,
+html[data-ubx] #data_f .panel-heading strong {
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+html[data-ubx] #data_f .panel-body > h2 {
+  font-size: var(--ubx-fs-6);
+  letter-spacing: 0;
+  margin: 2px 0 14px;
+}
+
+html[data-ubx] .ubx-files-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 0;
+}
+
+html[data-ubx] .panel-heading:has(> .ubx-files-toolbar) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 14px;
+}
+
+html[data-ubx] .ubx-files-crumb {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html[data-ubx] .ubx-files-toolbar .btn {
+  padding: 3px 10px;
+  font-size: var(--ubx-fs-1);
+}
+
+html[data-ubx] .ubx-files > tbody > tr > td {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+html[data-ubx] .ubx-files > tbody > tr > td:first-child {
+  width: 38px;
+  padding-right: 4px;
+}
+
+html[data-ubx] .ubx-files > tbody > tr > td:first-child svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  margin: 0 auto;
+  fill: currentColor;
+}
+
+html[data-ubx] .ubx-files tr[data-ubx-type="folder"] > td:first-child svg {
+  color: var(--ubx-accent);
+}
+
+html[data-ubx] .ubx-files tr[data-ubx-type="image"] > td:first-child svg {
+  /* the second accent keeps images apart from folders, which share the accent */
+  color: var(--ubx-accent-2);
+}
+
+html[data-ubx] .ubx-files tr[data-ubx-type="doc"] > td:first-child svg {
+  color: var(--ubx-warn);
+}
+
+html[data-ubx] .ubx-files tr[data-ubx-type="archive"] > td:first-child svg {
+  color: var(--ubx-danger);
+}
+
+html[data-ubx] .ubx-files tr[data-ubx-type="file"] > td:first-child svg {
+  color: var(--ubx-text-dim);
+}
+
+html[data-ubx] .ubx-files > tbody > tr > td:nth-child(2) {
+  /* the name column: weight 500 here was the synthetic face, and a whole column
+     of it was the loudest "pixelated" spot in the file browser */
+  font-weight: 400;
+}
+
+html[data-ubx] .ubx-files tr[data-ubx-kind="folder"] > td:nth-child(2) {
+  color: var(--ubx-accent);
+  font-weight: 600;
+}
+
+html[data-ubx] .ubx-files .ubx-file-size {
+  text-align: right;
+  color: var(--ubx-text-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+html[data-ubx] .ubx-files .ubx-file-size:empty::after {
+  content: "\2014";
+  color: var(--ubx-text-mute);
+}
+
+html[data-ubx] .ubx-files .ubx-file-date {
+  color: var(--ubx-text-mute);
+  font-size: var(--ubx-fs-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+html[data-ubx] .ubx-files > tbody > tr > td:last-child:empty {
+  display: none;
+}
+
+html[data-ubx] .ubx-files a.ubx-file-action {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 3px 9px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ubx-text-mute);
+  font-size: var(--ubx-fs-1);
+  line-height: 1.4;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+html[data-ubx] .ubx-files a.ubx-file-action + a.ubx-file-action {
+  border-color: var(--ubx-border);
+  color: var(--ubx-text-dim);
+}
+
+html[data-ubx] .ubx-files tr:hover a.ubx-file-action,
+html[data-ubx] .ubx-files a.ubx-file-action:hover,
+html[data-ubx] .ubx-files a.ubx-file-action:focus {
+  border-color: var(--ubx-border);
+  background: var(--ubx-surface-2);
+  color: var(--ubx-text);
+}
+
+/* ---------- login ---------- */
+/* The login page shares the shell (a navbar with only the brand and an empty
+   #data_f) but it is not a content view: it gets one card with the pixel brand
+   mark above it.
+
+   Two selectors per rule on purpose. html[data-ubx-login] is set by ubx.js, and
+   ubx.js reacts to the ajax answer with an 80ms debounce, so an attribute-only
+   layout painted the card in one place and moved it ~250ms later. The password
+   manager anchors its popup to the field at paint time and only re-anchors on a
+   window resize - that is the bubble that pointed far above the password box
+   until the window was resized. :has() applies in the same style pass as the
+   form insert, so nothing is measured against a half-themed page. */
+html[data-ubx] #data_f:has(form[name="login1"]),
+html[data-ubx-login] #data_f {
+  display: flex;
+  /* flex-start, not center: a vertically centred column moves every time its
+     content grows (a logo, a validation message) */
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: clamp(12px, 4vh, 56px);
+}
+
+html[data-ubx] #data_f:has(form[name="login1"]) > .row,
+html[data-ubx-login] #data_f > .row {
+  position: relative;
+  display: flex;
+  /* the brand mark and the card stack vertically - mark first, card below */
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--ubx-space-5);
+  width: 100%;
+  margin: 0;
+  /* room for the 224x231 mark, reserved from the first paint: the logo is
+     inserted a moment after the form, and a reserved slot means that insert
+     cannot move the fields */
+  padding-top: calc(231px + var(--ubx-space-4));
+}
+
+html[data-ubx] #data_f:has(form[name="login1"]) > .row > [class*="col-"],
+html[data-ubx-login] #data_f > .row > [class*="col-"] {
+  float: none;
+  padding: 0;
+}
+
+/* the stock markup centres the form between two empty spacer columns */
+html[data-ubx] #data_f:has(form[name="login1"]) > .row > [class*="col-"]:empty,
+html[data-ubx-login] #data_f > .row > [class*="col-"]:empty,
+html[data-ubx] #data_f:has(form[name="login1"]) > .row > .col-sm-3,
+html[data-ubx-login] #data_f > .row > .col-sm-3 {
+  display: none;
+}
+
+html[data-ubx] #data_f:has(form[name="login1"]) > .row > .col-sm-6,
+html[data-ubx-login] #data_f > .row > .col-sm-6 {
+  flex: 0 0 auto;
+  width: 420px;
+  max-width: 100%;
+}
+
+html[data-ubx] #data_f:has(form[name="login1"]) .panel,
+html[data-ubx-login] #data_f .panel {
+  margin: 0;
+  border: 1px solid var(--ubx-border);
+  border-radius: 16px;
+  background: var(--ubx-surface);
+  box-shadow: var(--ubx-shadow);
+  overflow: hidden;
+}
+
+html[data-ubx] #data_f:has(form[name="login1"]) .panel-body,
+html[data-ubx-login] #data_f .panel-body {
+  padding: var(--ubx-space-5);
+}
+
+html[data-ubx] #data_f:has(form[name="login1"]) .form-group,
+html[data-ubx-login] #data_f .form-group {
+  margin-bottom: var(--ubx-space-4);
+}
+
+html[data-ubx] #data_f:has(form[name="login1"]) label,
+html[data-ubx-login] #data_f label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--ubx-fs-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ubx-text-mute);
+}
+
+html[data-ubx] #data_f:has(form[name="login1"]) .form-control,
+html[data-ubx-login] #data_f .form-control {
+  height: 44px;
+  font-size: var(--ubx-fs-4);
+}
+
+html[data-ubx] #data_f:has(form[name="login1"]) .panel-body .btn,
+html[data-ubx-login] #data_f .panel-body .btn {
+  width: 100%;
+  height: 44px;
+  border: 0;
+  border-radius: var(--ubx-radius-sm);
+  /* the one action on the page, so it is the logo blue, like every .btn-primary */
+  background: var(--ubx-primary);
+  color: var(--ubx-on-primary);
+  font-size: var(--ubx-fs-4);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+html[data-ubx] #data_f:has(form[name="login1"]) .panel-body .btn:hover,
+html[data-ubx] #data_f:has(form[name="login1"]) .panel-body .btn:focus,
+html[data-ubx-login] #data_f .panel-body .btn:hover,
+html[data-ubx-login] #data_f .panel-body .btn:focus {
+  background: var(--ubx-primary-hover);
+  color: var(--ubx-on-primary);
+  filter: brightness(1.08);
+}
+
+/* ---------- feature: login brand ---------- */
+/* The card starts with the USERNAME label, so the page has no heading of its
+   own. login-brand.js puts the brand logo above the card instead of next to it.
+   The block is OUT OF FLOW: the row reserves the space (see the login section),
+   so inserting the mark cannot move the fields - a field that moves after the
+   first paint leaves a password-manager popup pointing at the old position. */
+html[data-ubx-login] .ubx-login-brand {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+/* the packaged file is a 224x231 hard-edged render (6 colours, 2.8 KB) made from
+   the source artwork, so it is painted 1:1 and scaled up in whole pixels -
+   pixelated keeps the steps sharp on a 2x screen instead of smearing them */
+html[data-ubx-login] .ubx-brand-img {
+  display: block;
+  width: 224px;
+  max-width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+
+/* ---------- responsive ---------- */
+/* The stock layout collapses the Bootstrap grid but leaves tables, toolbars and
+   chart canvases at their desktop width. These rules make every view usable on
+   a phone (390px) without hiding data: wide tables scroll inside their panel,
+   toolbars wrap, and the navigation stays reachable. */
+
+/* the login card is a single centred column now (the pixel mark sits above it,
+   inside the same column), so the row needs no extra width */
+
+/* Below 1200 the shell used to be forced to width:100%, which put the content at
+   x=0 while the navbar container started at 15px. The fluid min() in the layout
+   section already handles every width, so there is nothing to override here. */
+
+@media (max-width: 991px) {
+  /* the navbar links move into the collapsed menu: underline becomes a left
+     marker, so the active section is still visible in a stacked list */
+  html[data-ubx] .navbar-inverse .navbar-nav > li > a {
+    padding: 10px 14px;
+    border-bottom: 0;
+    border-left: 2px solid transparent;
+  }
+
+  html[data-ubx] .navbar-inverse .navbar-nav > li.active > a {
+    border-left-color: var(--ubx-accent);
+    border-bottom: 0;
+  }
+
+  html[data-ubx] .pos_bar {
+    margin-top: 12px;
+  }
+
+  html[data-ubx] #nav_pos {
+    font-size: var(--ubx-fs-2);
+    line-height: 1.5;
+  }
+
+  /* the statistics columns collapse to one */
+  html[data-ubx-view="statistics"] #data_f {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html[data-ubx] .panel-body {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-ubx] body {
+    font-size: var(--ubx-fs-3);
+  }
+
+  html[data-ubx] .container,
+  html[data-ubx] .container-fluid {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  html[data-ubx] .panel {
+    border-radius: var(--ubx-radius-sm);
+  }
+
+  html[data-ubx] .panel-default > .panel-heading {
+    padding: 11px 13px;
+    font-size: var(--ubx-fs-1);
+    letter-spacing: 0.06em;
+  }
+
+  html[data-ubx] .panel-body {
+    padding: 12px 13px;
+  }
+
+  html[data-ubx] #data_f h1,
+  html[data-ubx] #data_f h2 {
+    font-size: var(--ubx-fs-5);
+  }
+
+  /* wide tables scroll inside the panel instead of being clipped */
+  html[data-ubx] #data_f .panel-body > table,
+  html[data-ubx] #data_f .panel-body > .table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  html[data-ubx] #data_f .panel-body > table > tbody > tr > td {
+    white-space: normal;
+  }
+
+  /* DataTables toolbar */
+  html[data-ubx] .dataTables_wrapper .row > div {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  html[data-ubx] .dataTables_wrapper .dataTables_filter {
+    text-align: left;
+    margin-bottom: var(--ubx-space-2);
+  }
+
+  html[data-ubx] .dataTables_wrapper .dataTables_filter input {
+    width: calc(100% - 70px);
+    max-width: 260px;
+  }
+
+  html[data-ubx] .dt-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0 4px;
+  }
+
+  html[data-ubx] .dt-buttons .btn,
+  html[data-ubx] .dt-buttons .btn.glyphicon {
+    min-height: 32px;
+    padding: 5px 10px;
+    font-size: var(--ubx-fs-2);
+  }
+
+  html[data-ubx] .dataTables_wrapper .dataTables_scrollBody,
+  html[data-ubx] .dataTables_wrapper .dataTables_scrollHeadInner {
+    overscroll-behavior-x: contain;
+  }
+
+  html[data-ubx] .dataTables_wrapper .dataTables_info {
+    padding-top: 8px;
+    font-size: var(--ubx-fs-1);
+  }
+
+  html[data-ubx] .dataTables_wrapper .dataTables_paginate .pagination {
+    flex-wrap: wrap;
+  }
+
+  /* stacked button rows (status actions, file actions) */
+  html[data-ubx] #data_f .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  html[data-ubx] #data_f .btn-group > .btn {
+    float: none;
+    margin: 0 !important;
+  }
+
+  /* the grid keeps its own gutters: a -15px .row overflows the 10px padding */
+  html[data-ubx] #data_f .row,
+  html[data-ubx] #nav_pos .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  html[data-ubx] #data_f .row > [class*='col-'],
+  html[data-ubx] #nav_pos .row > [class*='col-'] {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* inline filter bars (Logs) size to their content, not to the row */
+  html[data-ubx] #nav_pos .form-inline,
+  html[data-ubx] #nav_pos .form-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    margin: 0;
+    max-width: 100%;
+  }
+
+  html[data-ubx] #nav_pos .form-control {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* settings tabs: one scrollable row instead of three */
+  html[data-ubx] #settings_tabber {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+
+  html[data-ubx] #settings_tabber > li {
+    float: none;
+    flex: 0 0 auto;
+  }
+
+  html[data-ubx] #settings_tabber > li > a {
+    white-space: nowrap;
+  }
+
+  /* status chips keep their line but get compact */
+  html[data-ubx] .ubx-chip {
+    padding: 1px 8px 1px 7px;
+    font-size: var(--ubx-fs-1);
+    font-weight: 600;
+  }
+
+  html[data-ubx] .ubx-chip::before {
+    width: 5px;
+    height: 5px;
+    margin-right: 5px;
+  }
+
+  /* footer: two compact rows (the shell rule owns its width/padding) */
+  html[data-ubx] .ubx-footer .well,
+  html[data-ubx] .ubx-footer .well-sm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+  }
+
+  html[data-ubx] .ubx-footer .well-sm .control-label,
+  html[data-ubx] .ubx-footer .well-sm > form {
+    margin: 0;
+  }
+
+  html[data-ubx] .ubx-footer select.form-control {
+    max-width: 150px;
+    height: 28px;
+    font-size: var(--ubx-fs-1);
+  }
+
+  html[data-ubx] .ubx-footer .navbar-text,
+  html[data-ubx] .ubx-footer .navbar-right {
+    font-size: var(--ubx-fs-1);
+    margin: 0;
+    float: none !important;
+  }
+
+  /* dialogs and popovers must fit the screen */
+  html[data-ubx] .modal-dialog {
+    width: auto !important;
+    margin: 10px;
+  }
+
+  html[data-ubx] .popover {
+    max-width: calc(100vw - 24px);
+  }
+
+  /* dropdown menus already open at the field width */
+  html[data-ubx] .bootstrap-select > .dropdown-menu {
+    min-width: 100%;
+  }
+}
+
+/* phones: the collapsed navbar becomes a proper full-width menu */
+@media (max-width: 767px) {
+  /* the fixed bar must never be wider than the screen: on Logs/Statistics a
+     filter control stretches the row past 390px */
+  html[data-ubx] .navbar-fixed-top {
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+
+  html[data-ubx] .navbar-fixed-top > .container-fluid {
+    box-sizing: border-box;
+    overflow-x: clip;
+  }
+
+  html[data-ubx] .navbar-fixed-top .form-control,
+  html[data-ubx] .navbar-fixed-top select {
+    max-width: 100%;
+  }
+
+  /* the brand row must not push the fixed navbar past the screen edge */
+  html[data-ubx] .navbar-inverse .navbar-header {
+    float: none;
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  html[data-ubx] .navbar-inverse .navbar-brand {
+    min-width: 0;
+    padding-right: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  html[data-ubx] .navbar-inverse .navbar-toggle {
+    float: none;
+    flex: 0 0 auto;
+  }
+
+  html[data-ubx] .navbar-inverse .navbar-collapse {
+    border: 0;
+    box-shadow: none;
+    background: var(--ubx-nav);
+    margin-top: 6px;
+  }
+
+  html[data-ubx] .navbar-inverse .navbar-nav {
+    margin: 0;
+  }
+
+  html[data-ubx] .navbar-inverse .navbar-nav > li > a {
+    padding: 11px 16px;
+    font-size: var(--ubx-fs-4);
+  }
+}
