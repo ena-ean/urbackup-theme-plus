@@ -72,7 +72,7 @@ hand.
 
 - UrBackup 2.4 and 2.5, Chrome, Edge or any Chromium 111 or newer. Dark only.
 - No analytics, no telemetry, no remote calls. Settings stay in
-  `chrome.storage.sync`.
+  `chrome.storage.sync`. See [PRIVACY.md](PRIVACY.md).
 
 ## Status
 
