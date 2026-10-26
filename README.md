@@ -2,7 +2,7 @@
 
 An alternative visual style for the [UrBackup](https://www.urbackup.org/) web
 interface, with a few small things that make the panel easier to use every day. A
-browser extension for Chrome and Edge, written in plain CSS and JavaScript. No
+browser extension for Chrome, written in plain CSS and JavaScript. No
 build step, no dependencies.
 
 UrBackup is great software and I run it on my own server. I wanted a different
@@ -70,7 +70,7 @@ hand.
 
 ## Good to know
 
-- UrBackup 2.4 and 2.5, Chrome, Edge or any Chromium 111 or newer. Dark only.
+- UrBackup 2.4 and 2.5, Chrome or any Chromium 111 or newer. Dark only.
 - No analytics, no telemetry, no remote calls. Settings stay in
   `chrome.storage.sync`. See [PRIVACY.md](PRIVACY.md).
 
